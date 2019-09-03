@@ -90,7 +90,7 @@ def main
 
   while true
     sync_loop(user, submission_statuses)
-    sleep(10)
+    sleep(SLEEP_TIME)
   end
 end
 
