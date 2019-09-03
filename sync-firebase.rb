@@ -3,10 +3,12 @@
 require 'faraday'
 require 'json'
 
+require_relative 'prg_api'
+
 BOT_USER = 'test1'
-URL = 'https://asia-east2-grader-ef0b5.cloudfunctions.net/getOldestSubmissionsInQueue'
+BASE_URL = 'https://asia-east2-grader-ef0b5.cloudfunctions.net'
 LIMIT = 10
-SLEEP_TIME = 60
+SLEEP_TIME = 5
 
 LANGUAGE_NAMES = {
   'c_cpp' => 'cpp',
@@ -36,21 +38,59 @@ def create_submission(res, user)
 
   Task.create(submission: submission,
               status: Task::STATUS_INQUEUE)
+
+  return submission
 end
 
-def main
-  user = User.find_by login: BOT_USER
-    
-  response = Faraday.post(URL,
-                          "{\"data\":{\"limit\":#{LIMIT}}}",
-                          {'Content-Type' => 'application/json'})
+def sync_loop(user, submission_statuses)
+  response = call_api_get_oldest_submissions_in_queue(BASE_URL)
   if response.status != 200
     puts 'Request error'
   else
     results = JSON.parse(response.body)['result']
     results.each do |res|
-      create_submission(res, user)
+      next if !(res.has_key? 'submission_id')
+      
+      submission_id = res['submission_id']
+
+      if !submission_statuses.has_key? submission_id
+        sub = create_submission(res, user)
+        puts "created #{submission_id}"
+
+        submission_statuses[submission_id] = {
+          status: :created,
+          sub_id: sub.id
+        }
+      end
     end
+  end
+
+  submission_statuses.each do |submission_id, data|
+    if data[:status] == :created
+      submission = Submission.find(data[:sub_id])
+      if submission and submission.graded_at
+        puts "#{submission_id} - graded: #{submission.grader_comment}"
+        submission_statuses[submission_id][:status] = :graded
+
+        call_api_update_submission_status(BASE_URL,
+                                          submission_id,
+                                          submission.grader_comment,
+                                          submission.points,
+                                          submission.max_runtime,
+                                          submission.peak_memory,
+                                          submission.graded_at)
+      end
+    end
+  end
+end
+
+def main
+  user = User.find_by login: BOT_USER
+  submission_statuses = {}
+
+  while true
+    sync_loop(user, submission_statuses)
+    sleep(10)
   end
 end
 
