@@ -15,22 +15,10 @@ def call_api_update_submission_status(base_url,
                                       time,
                                       memory,
                                       graded_at)
-  payload = {
-    "data" => {
-      "submission_id" => submission_id,
-      "status" => status,
-      "points" => points,
-      "time" => time || 0,
-      "memory" => memory || 0,
-      "graded_at" => graded_at
-    }
-  }
+  time ||= 0
+  memory ||= 0
 
-  token = get_token
-  #puts "TOKEN #{token}"
-  #puts "Payload: #{payload.to_json}"
-  response = Faraday.post("#{base_url}/updateSubmissionStatus?auth=${token}",
-                          payload.to_json,
-                          {'Content-Type' => 'application/json'})
-  puts response.body
+  cmd = "python update_submission.py #{submission_id} \"#{status}\" #{points} #{time} #{memory} \"#{graded_at}\""
+  puts(cmd)
+  system(cmd)
 end

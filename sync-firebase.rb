@@ -24,6 +24,11 @@ require RAILS_ROOT + '/config/environment'
 def create_submission(res, user)
   problem_name = res['problem_id']
   problem = Problem.find_by name: problem_name
+
+  if !LANGUAGE_NAMES[res['language']]
+    res['language'] = 'c_cpp'
+  end
+    
   language = Language.find_by name: LANGUAGE_NAMES[res['language']]
 
   submission = Submission.new
