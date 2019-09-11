@@ -1,0 +1,7 @@
+BOT_USER = 'graderuser'
+
+BASE_URL = 'https://yoururl.cloudfunctions.net'
+FIREBASE_CREDENTIAL_FILE = 'grader-something.json'
+
+LIMIT = 10
+SLEEP_TIME = 1

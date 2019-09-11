@@ -5,21 +5,22 @@ from firebase_admin import firestore
 import sys
 
 FIELDS = {
-    'status': (2,'string'),
-    'points': (3, 'int'),
-    'time': (4, 'float'),
-    'memory': (5, 'int'),
-    'graded_at': (6,'string'),
+    'status': (3,'string'),
+    'points': (4, 'int'),
+    'time': (5, 'float'),
+    'memory': (6, 'int'),
+    'graded_at': (7,'string'),
 }
 INT_FIELDS = ['points', 'memory']
 FLOAT_FIELDS = ['time']
 
 def main():
-    cred = credentials.Certificate('service_account_private_key.json')
+    cred = credentials.Certificate(sys.argv[1])
+    
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 
-    submission_id = sys.argv[1]
+    submission_id = sys.argv[2]
     
     data = {}
     for f in FIELDS.keys():

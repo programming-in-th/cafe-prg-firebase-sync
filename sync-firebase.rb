@@ -4,11 +4,7 @@ require 'faraday'
 require 'json'
 
 require_relative 'prg_api'
-
-BOT_USER = 'test1'
-BASE_URL = 'https://asia-east2-grader-ef0b5.cloudfunctions.net'
-LIMIT = 10
-SLEEP_TIME = 5
+require_relative 'sync_config'
 
 LANGUAGE_NAMES = {
   'c_cpp' => 'cpp',
@@ -78,6 +74,7 @@ def sync_loop(user, submission_statuses)
         submission_statuses[submission_id][:status] = :graded
 
         call_api_update_submission_status(BASE_URL,
+                                          FIREBASE_CREDENTIAL_FILE,
                                           submission_id,
                                           submission.grader_comment,
                                           submission.points,
