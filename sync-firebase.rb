@@ -11,6 +11,8 @@ LANGUAGE_NAMES = {
   'python' => 'python'
 }
 
+FALLBACK_PROBLEM_NAME = 'nonexistance'
+
 # judge/rails initialization
 GRADER_ENV = 'grading'
 require File.join(File.dirname(__FILE__),'config/environment')
@@ -20,6 +22,10 @@ require RAILS_ROOT + '/config/environment'
 def create_submission(res, user)
   problem_name = res['problem_id']
   problem = Problem.find_by name: problem_name
+
+  if !problem
+    problem = Problem.find_by name: FALLBACK_PROBLEM_NAME
+  end
 
   if !LANGUAGE_NAMES[res['language']]
     res['language'] = 'c_cpp'
