@@ -7,7 +7,7 @@ require_relative 'prg_api'
 require_relative 'sync_config'
 
 LANGUAGE_NAMES = {
-  'c_cpp' => 'cpp',
+  'text/x-csrc' => 'cpp',
   'python' => 'python'
 }
 
@@ -22,7 +22,7 @@ def create_submission(res, user)
   problem = Problem.find_by name: problem_name
 
   if !LANGUAGE_NAMES[res['language']]
-    res['language'] = 'c_cpp'
+    res['language'] = 'text/x-csrc'
   end
     
   language = Language.find_by name: LANGUAGE_NAMES[res['language']]
