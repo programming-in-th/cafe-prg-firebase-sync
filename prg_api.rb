@@ -1,7 +1,11 @@
 def call_api_get_oldest_submissions_in_queue(base_url)
-  Faraday.post("#{base_url}/getOldestSubmissionsInQueue",
-               "{\"data\":{\"limit\":#{LIMIT}}}",
-               {'Content-Type' => 'application/json'})
+  begin
+    Faraday.post("#{base_url}/getOldestSubmissionsInQueue",
+                 "{\"data\":{\"limit\":#{LIMIT}}}",
+                 {'Content-Type' => 'application/json'})
+  rescue
+    return nil
+  end
 end
 
 def call_api_update_submission_status(base_url,

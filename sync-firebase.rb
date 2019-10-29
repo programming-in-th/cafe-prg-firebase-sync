@@ -51,7 +51,7 @@ end
 
 def sync_loop(user, submission_statuses)
   response = call_api_get_oldest_submissions_in_queue(BASE_URL)
-  if response.status != 200
+  if !response or response.status != 200
     puts 'Request error'
   else
     results = JSON.parse(response.body)['result']
