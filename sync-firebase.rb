@@ -6,12 +6,8 @@ require 'json'
 require_relative 'prg_api'
 require_relative 'sync_config'
 
-LANGUAGE_NAMES = {
-  'text/x-csrc' => 'cpp',
-  'python' => 'python'
-}
-
 FALLBACK_PROBLEM_NAME = 'nonexistance'
+FALLBACK_LANGUAGE = 'cpp'
 
 # judge/rails initialization
 GRADER_ENV = 'grading'
@@ -22,16 +18,15 @@ require RAILS_ROOT + '/config/environment'
 def create_submission(res, user)
   problem_name = res['problem_id']
   problem = Problem.find_by name: problem_name
-
+  language = Language.find_by name: res['language']
+  
   if !problem
     problem = Problem.find_by name: FALLBACK_PROBLEM_NAME
   end
 
-  if !LANGUAGE_NAMES[res['language']]
-    res['language'] = 'text/x-csrc'
+  if !language
+    language = Language.find_by name: FALLBACK_LANGUAGE
   end
-    
-  language = Language.find_by name: LANGUAGE_NAMES[res['language']]
 
   submission = Submission.new
   submission.language = language
